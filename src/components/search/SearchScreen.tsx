@@ -16,16 +16,11 @@ import {
 import searchQuery from '../../graphql/query/searchQuery';
 import {SearchEmpty} from './SearchEmpty';
 import {SearchTile} from './SearchTile';
+import FeatherIcon from 'react-native-vector-icons/Feather';
 
 const styles = StyleSheet.create({
   searchInput: {
-    backgroundColor: '#DCDCDC',
-    height: 50,
-    marginTop: 10,
-    marginLeft: 20,
-    marginRight: 20,
-    borderRadius: 10,
-    paddingLeft: 20,
+    height: 40,
   },
 });
 
@@ -46,14 +41,34 @@ export default function SearchScreen() {
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
-      <TextInput
-        placeholder="Search"
-        style={styles.searchInput}
-        onChangeText={setTerm}
-        autoCorrect={false}
-        onSubmitEditing={onSearch}
-        value={term}
-      />
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          height: 40,
+          borderRadius: 10,
+          paddingLeft: 10,
+          width: '90%',
+          backgroundColor: '#DCDCDC',
+          marginLeft: 20,
+          marginTop: 20,
+          marginBottom: 20,
+        }}>
+        <FeatherIcon
+          name="search"
+          size={20}
+          color="grey"
+          style={{marginRight: 10}}
+        />
+        <TextInput
+          placeholder="Search"
+          style={styles.searchInput}
+          onChangeText={setTerm}
+          autoCorrect={false}
+          onSubmitEditing={onSearch}
+          value={term}
+        />
+      </View>
       <FlatList<SearchQuery_search>
         keyboardShouldPersistTaps="never"
         data={data?.search ?? []}
@@ -63,7 +78,7 @@ export default function SearchScreen() {
         ListHeaderComponent={
           <>
             {loading && (
-              <View style={{height: 100}}>
+              <View style={{height: 100, marginTop: 20}}>
                 <ActivityIndicator size="large" color="blue" />
               </View>
             )}

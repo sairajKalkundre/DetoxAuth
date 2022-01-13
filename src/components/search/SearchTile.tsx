@@ -1,8 +1,11 @@
 import {SearchQuery_search} from '../../types/graphql';
-import {Image, Text, View} from 'react-native';
+import {Image, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
+import {useNavigation} from '@react-navigation/native';
 
 export function SearchTile(props: {item: SearchQuery_search}) {
+  const navigation = useNavigation();
+
   return (
     <View
       style={{
@@ -38,9 +41,16 @@ export function SearchTile(props: {item: SearchQuery_search}) {
         <Text style={{marginLeft: 20, fontSize: 14, color: 'grey'}}>
           {props.item.artist}
         </Text>
-        <Text style={{marginLeft: 20, fontSize: 14, color: '#1E90FF'}}>
-          {props.item.episodesCount} episodes
-        </Text>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate('PodcastDetails', {
+              data: props.item,
+            })
+          }>
+          <Text style={{marginLeft: 20, fontSize: 14, color: '#1E90FF'}}>
+            {props.item.episodesCount} episodes
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
