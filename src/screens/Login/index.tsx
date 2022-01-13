@@ -68,7 +68,7 @@ export default function Login() {
         <TouchableOpacity
           style={{
             height: 55,
-            width: '80%',
+            width: '85%',
             backgroundColor: '#AD1E3A',
             marginLeft: 30,
             marginTop: 50,

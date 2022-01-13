@@ -1,22 +1,17 @@
-import React, {useState} from 'react';
-import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
-import NewMessageForm from './src/NewMesssageForm';
-import {grays} from 'constants/colors';
-const App = () => {
-  const [messages, setMessages] = useState([]);
-  const handleSend = newMessage => {
-    setMessages([newMessage, ...messages]);
-  };
+import React from 'react';
+import MainStackNavigator from './src/navigators/MainStackNavigator';
+import {NavigationContainer} from '@react-navigation/native';
+import {ApolloProvider} from '@apollo/client';
+import {client} from './src/graphql/client';
 
+const App = () => {
   return (
-    <SafeAreaView>
-      <StatusBar barStyle="dark-content" />
-      <NewMessageForm onSend={handleSend} />
-      <MessageList data={messages} />
-    </SafeAreaView>
+    <ApolloProvider client={client}>
+      <NavigationContainer>
+        <MainStackNavigator />
+      </NavigationContainer>
+    </ApolloProvider>
   );
 };
-
-const styles = StyleSheet.create({});
 
 export default App;
