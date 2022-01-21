@@ -1,8 +1,12 @@
 import React from 'react';
-import {FlatList, Image, StyleSheet, Text, View} from 'react-native';
+import {ActivityIndicator, FlatList, Image, StyleSheet, Text, View} from 'react-native';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import {SearchStackRouteParamsList} from '../../navigators/types';
 import FeatherIcon from 'react-native-vector-icons/Feather';
+import {useQuery} from "@apollo/client";
+import {FeedQuery, FeedQueryVariables} from "../../types/graphql";
+import feedQuery from "../../graphql/query/feedQuery";
+import {getWeekDay, humanDuration} from "../../lib/dateTimeHelper";
 
 type NavigationParams = RouteProp<SearchStackRouteParamsList, 'PodcastDetails'>;
 
@@ -14,7 +18,12 @@ const styles = StyleSheet.create({
   },
 });
 const PodcastDetailScreen = () => {
-  const {data} = useRoute<NavigationParams>().params ?? {};
+  const {data : podcastData} = useRoute<NavigationParams>().params ?? {};
+  const {data , loading} = useQuery<FeedQuery,FeedQueryVariables>(feedQuery , {
+      variables : {
+          feedUrl : podcastData.feedUrl
+      }
+  })
   return (
     <View style={{flex: 1, backgroundColor: 'white'}}>
       <FlatList
@@ -27,19 +36,19 @@ const PodcastDetailScreen = () => {
                 paddingLeft: 10,
                 marginBottom: 20,
               }}>
-              {data.thumbnail && (
+              {podcastData.thumbnail && (
                 <Image
-                  source={{uri: data.thumbnail}}
+                  source={{uri: podcastData.thumbnail}}
                   style={styles.imageStyle}
                 />
               )}
               <View style={{flex: 1}}>
                 <Text style={{fontSize: 18, fontWeight: 'bold'}}>
-                  {data.podcastName}
+                  {podcastData.podcastName}
                 </Text>
                 <Text
                   style={{fontSize: 16, fontWeight: '500', color: '#C9C9C9'}}>
-                  {data.artist}
+                  {podcastData.artist}
                 </Text>
                 <Text
                   style={{fontSize: 16, fontWeight: '500', color: '#87CEFA'}}>
@@ -50,7 +59,11 @@ const PodcastDetailScreen = () => {
             <View style={{paddingLeft: 10}}>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <FeatherIcon name="play" size={30} style={{marginRight: 10}} />
+                  <View>
                 <Text style={{fontSize: 18, fontWeight: 'bold'}}>Play</Text>
+                  <Text style={{fontSize: 14, fontWeight: '200'}}>{data?.feed[0].title}</Text>
+                  </View>
+
               </View>
             </View>
             <View style={{paddingLeft: 10, marginBottom: 20}}>
@@ -58,9 +71,14 @@ const PodcastDetailScreen = () => {
                 Episodes
               </Text>
             </View>
+              {loading && (
+                  <View>
+                      <ActivityIndicator size={"large"} color={"blue"}/>
+                  </View>
+              )}
           </>
         }
-        data={[{id: '1'}, {id: '2'}]}
+        data={data?.feed }
         ItemSeparatorComponent={() => (
           <View
             style={{
@@ -77,28 +95,19 @@ const PodcastDetailScreen = () => {
             />
           </View>
         )}
-        renderItem={() => (
+        renderItem={({item}) => (
           <View style={{marginLeft: 10, flex: 1}}>
-            <Text style={{fontSize: 18, color: 'grey'}}>FRIDAY</Text>
-            <Text style={{fontSize: 18, fontWeight: 'bold'}}>
-              #400 - The Title
+            <Text style={{fontSize: 14, color: 'grey'}}>{getWeekDay(new Date(item?.pubDate)).toUpperCase() }</Text>
+            <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+                {item.title}
             </Text>
-            <Text style={{fontSize: 16}} numberOfLines={2}>
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s, when an unknown printer took a galley of
-              type and scrambled it to make a type specimen book. It has
-              survived not only five centuries, but also the leap into
-              electronic typesetting, remaining essentially unchanged. It was
-              popularised in the 1960s with the release of Letraset sheets
-              containing Lorem Ipsum passages, and more recently with desktop
-              publishing software like Aldus PageMaker including versions of
-              Lorem Ipsum.
+            <Text style={{fontSize: 16 , color : 'grey'}} numberOfLines={2}>
+                {item?.description}
             </Text>
-            <Text style={{fontSize: 18}}>3hrs.13min</Text>
+            <Text style={{fontSize: 14 , color : 'grey',fontWeight : '200'}}>{humanDuration(item.duration)}</Text>
           </View>
         )}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item?.linkUrl}
       />
     </View>
   );
